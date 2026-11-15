@@ -28,8 +28,15 @@ jobs:
         env:
           BEEP_BASE: /${{ github.event.repository.name }}/
           VITE_NOVA_OFFLINE: "1"
-      # Serve the app for any deep link (e.g. /beep-co/device/glass).
-      - run: cp dist/index.html dist/404.html
+      # Give every known route its own index.html so deep links return 200;
+      # 404.html catches anything else.
+      - run: |
+          cp dist/index.html dist/404.html
+          for r in cart ceo compare desk devices hq mine orders signal \
+                   device/glass device/slate device/deck device/ping device/canvas \
+                   device/hub device/view device/arc device/pod device/fin; do
+            mkdir -p "dist/$r" && cp dist/index.html "dist/$r/index.html"
+          done
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
